@@ -9,9 +9,12 @@ const { processImage } = require('./core');
 const { ensureDir } = require('./utils');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+const PUBLIC_URL = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL || '*', // Allow Vercel frontend in production
+}));
 app.use(express.json());
 
 // Setup storage
@@ -74,9 +77,9 @@ app.post('/api/upload', upload.array('images'), async (req, res) => {
             sessionId,
             results: results.map(r => ({
                 ...r,
-                url: `/output/${sessionId}/${r.policy.toLowerCase()}/${r.file}`
+                url: `${PUBLIC_URL}/output/${sessionId}/${r.policy.toLowerCase()}/${r.file}`
             })),
-            zipUrl: `/output/${sessionId}/images.zip`
+            zipUrl: `/output/${sessionId}/images.zip` // Keep zipUrl relative for the frontend dynamic binding
         });
 
     } catch (err) {
@@ -86,5 +89,5 @@ app.post('/api/upload', upload.array('images'), async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on ${PUBLIC_URL}`);
 });

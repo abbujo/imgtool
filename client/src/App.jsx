@@ -10,6 +10,7 @@ function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [zipUrl, setZipUrl] = useState(null);
   const [error, setError] = useState(null);
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
   const handleDrop = async (files) => {
     setIsProcessing(true);
@@ -23,7 +24,7 @@ function App() {
     });
 
     try {
-      const response = await axios.post('http://localhost:3001/api/upload', formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -86,7 +87,7 @@ function App() {
                 <h2 className="text-2xl font-bold text-slate-200">Results ({results.length})</h2>
                 {zipUrl && (
                   <a
-                    href={`http://localhost:3001${zipUrl}`}
+                    href={`${API_BASE_URL}${zipUrl}`}
                     className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-2 px-6 rounded-lg transition-colors shadow-lg shadow-cyan-500/20"
                   >
                     Download ZIP
