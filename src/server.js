@@ -17,6 +17,11 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Health check endpoint
+app.get('/ping', (req, res) => {
+    res.json({ status: 'ok', message: 'imgpipe API is running' });
+});
+
 // Setup storage
 const UPLOADS_DIR = path.join(__dirname, '../uploads');
 const OUTPUT_DIR = path.join(__dirname, '../output');
