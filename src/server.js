@@ -47,7 +47,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Serve output files statically
-app.use('/output', express.static(OUTPUT_DIR));
+app.use('/output', (req, res, next) => {
+    if (req.query.download) {
+        res.setHeader('Content-Disposition', 'attachment');
+    }
+    next();
+}, express.static(OUTPUT_DIR));
 
 app.post('/api/upload', upload.fields([
     { name: 'hero' },
@@ -131,9 +136,9 @@ app.post('/api/upload', upload.fields([
             sessionId,
             results: results.map(r => ({
                 ...r,
-                url: `${PUBLIC_URL}/output/${sessionId}/${r.policy.toLowerCase()}/${r.file}`
+                url: `${PUBLIC_URL}/output/${sessionId}/${r.policy.toLowerCase()}/${encodeURIComponent(r.file)}`
             })),
-            zipUrl: `/output/${sessionId}/images.zip` // Keep zipUrl relative for the frontend dynamic binding
+            zipUrl: `/output/${sessionId}/images.zip?download=1` // Keep zipUrl relative for the frontend dynamic binding
         });
 
     } catch (err) {

@@ -4,7 +4,7 @@ const path = require('path');
 const POLICIES = {
     HERO: {
         widths: [400, 720, 800, 1200, 1440],
-        options: { quality: 50, effort: 6 },
+        options: { quality: 50, effort: 4 },
     },
     CARD: {
         widths: [320, 480, 640, 960],
