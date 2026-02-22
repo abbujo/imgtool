@@ -12,7 +12,7 @@ function App() {
   const [error, setError] = useState(null);
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-  const handleDrop = async (files) => {
+  const handleDrop = async (files, type = 'images') => {
     setIsProcessing(true);
     setError(null);
     setResults([]);
@@ -20,7 +20,7 @@ function App() {
 
     const formData = new FormData();
     files.forEach(file => {
-      formData.append('images', file);
+      formData.append(type, file);
     });
 
     try {
@@ -57,7 +57,12 @@ function App() {
       </header>
 
       <main className="w-full max-w-5xl z-10">
-        <Dropzone onDrop={handleDrop} isProcessing={isProcessing} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+          <Dropzone onDrop={handleDrop} isProcessing={isProcessing} type="hero" title="Hero" icon="🖼️" />
+          <Dropzone onDrop={handleDrop} isProcessing={isProcessing} type="card" title="Card" icon="🎴" />
+          <Dropzone onDrop={handleDrop} isProcessing={isProcessing} type="logo" title="Logo" icon="🎯" />
+          <Dropzone onDrop={handleDrop} isProcessing={isProcessing} type="icon" title="Icon (.ico)" icon="✨" />
+        </div>
 
         {error && (
           <motion.div

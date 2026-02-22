@@ -15,8 +15,8 @@ const POLICIES = {
         options: { quality: 50 },
     },
     ICON: {
-        widths: [32, 48, 64, 96, 128, 192],
-        options: { quality: 50 },
+        widths: [16, 32, 48, 64, 128],
+        options: { quality: 100 }, // Quality doesn't strictly apply to ICO but kept for consistency
     },
     LOGO: {
         widths: [128, 192, 256, 384, 512],

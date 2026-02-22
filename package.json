@@ -25,6 +25,7 @@
     "glob": "^8.1.0",
     "multer": "^2.0.2",
     "ora": "^5.4.1",
+    "png-to-ico": "^3.0.1",
     "sharp": "^0.34.5"
   },
   "devDependencies": {

@@ -49,18 +49,35 @@ const upload = multer({ storage: storage });
 // Serve output files statically
 app.use('/output', express.static(OUTPUT_DIR));
 
-app.post('/api/upload', upload.array('images'), async (req, res) => {
+app.post('/api/upload', upload.fields([
+    { name: 'hero' },
+    { name: 'card' },
+    { name: 'logo' },
+    { name: 'icon' },
+    { name: 'images' } // fallback
+]), async (req, res) => {
     const startTime = Date.now();
     console.log(`[INFO] Starting upload process for new request`);
 
     try {
-        const files = req.files;
-        if (!files || files.length === 0) {
+        let fileList = [];
+        if (req.files) {
+            for (const policyKey of ['hero', 'card', 'logo', 'icon', 'images']) {
+                if (req.files[policyKey]) {
+                    req.files[policyKey].forEach(f => {
+                        const mappedPolicy = policyKey === 'images' ? null : policyKey.toUpperCase();
+                        fileList.push({ file: f, policy: mappedPolicy });
+                    });
+                }
+            }
+        }
+
+        if (fileList.length === 0) {
             console.warn(`[WARN] No files found in request`);
             return res.status(400).json({ error: 'No files uploaded' });
         }
 
-        console.log(`[INFO] Received ${files.length} files for processing`);
+        console.log(`[INFO] Received ${fileList.length} files for processing`);
 
         const sessionId = Date.now().toString();
         const sessionOutputDir = path.join(OUTPUT_DIR, sessionId);
@@ -78,11 +95,14 @@ app.post('/api/upload', upload.array('images'), async (req, res) => {
             dryRun: false
         };
 
-        console.log(`[INFO] Processing with options:`, options);
+        console.log(`[INFO] Processing with default options:`, options);
 
-        for (const file of files) {
-            console.log(`[INFO] Processing file: ${file.originalname} (${file.size} bytes)`);
-            const fileResults = await processImage(file.path, sessionOutputDir, options);
+        for (const item of fileList) {
+            const { file, policy } = item;
+            console.log(`[INFO] Processing file: ${file.originalname} (${file.size} bytes) with policy ${policy}`);
+
+            const fileOptions = { ...options, policy };
+            const fileResults = await processImage(file.path, sessionOutputDir, fileOptions);
             results.push(...fileResults);
 
             console.log(`[INFO] Successfully processed ${file.originalname}, removing temporary upload: ${file.path}`);

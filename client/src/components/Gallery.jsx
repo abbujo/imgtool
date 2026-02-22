@@ -16,13 +16,12 @@ export default function Gallery({ results }) {
                     className="glass p-4 flex flex-col items-center"
                 >
                     <div className="relative w-full aspect-video bg-slate-800/50 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
-                        {/* We might need a way to serve these images or just show a placeholder/icon if path is local */}
-                        {/* Since we have the server serving /output, we can try to use that URL if we constructed it properly */}
+                        {/* The url is already a fully qualified string from the backend or a relative string. */}
                         <img
-                            src={`http://localhost:3001${item.url}`}
+                            src={item.url.startsWith('http') ? item.url : `http://localhost:3001${item.url}`}
                             alt={item.file}
                             className="object-contain max-h-full"
-                            onError={(e) => { e.target.src = 'https://via.placeholder.com/300x200?text=AVIF'; }}
+                            onError={(e) => { e.target.src = 'https://via.placeholder.com/300x200?text=Error'; }}
                         />
                         <div className="absolute top-2 right-2 bg-black/70 px-2 py-1 rounded text-xs text-white">
                             {item.width}w
@@ -38,7 +37,7 @@ export default function Gallery({ results }) {
                                 {(item.size / 1024).toFixed(1)} KB
                             </span>
                             <a
-                                href={`http://localhost:3001${item.url}`}
+                                href={item.url.startsWith('http') ? item.url : `http://localhost:3001${item.url}`}
                                 download
                                 className="text-cyan-400 text-xs hover:text-cyan-300 font-bold"
                             >
