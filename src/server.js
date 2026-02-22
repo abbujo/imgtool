@@ -136,7 +136,7 @@ app.post('/api/upload', upload.fields([
             sessionId,
             results: results.map(r => ({
                 ...r,
-                url: `${PUBLIC_URL}/output/${sessionId}/${r.policy.toLowerCase()}/${encodeURIComponent(r.file)}`
+                url: `/output/${sessionId}/${r.policy.toLowerCase()}/${encodeURIComponent(r.file)}`
             })),
             zipUrl: `/output/${sessionId}/images.zip?download=1` // Keep zipUrl relative for the frontend dynamic binding
         });
