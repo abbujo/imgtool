@@ -13,6 +13,7 @@ function App() {
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
+
   const handleDrop = async (files, type = 'images') => {
     setIsProcessing(true);
     setError(null);
@@ -100,7 +101,7 @@ function App() {
                   </a>
                 )}
               </div>
-              <Gallery results={results} />
+              <Gallery results={results} apiBaseUrl={API_BASE_URL} />
             </motion.div>
           )}
         </AnimatePresence>
