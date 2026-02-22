@@ -10,6 +10,7 @@ function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [zipUrl, setZipUrl] = useState(null);
   const [error, setError] = useState(null);
+
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
   const handleDrop = async (files, type = 'images') => {

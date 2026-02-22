@@ -37,7 +37,7 @@ export default function Gallery({ results }) {
                                 {(item.size / 1024).toFixed(1)} KB
                             </span>
                             <a
-                                href={item.url.startsWith('http') ? item.url : `http://localhost:3001${item.url}`}
+                                href={`${item.url.startsWith('http') ? item.url : 'http://localhost:3001' + item.url}?download=1`}
                                 download
                                 className="text-cyan-400 text-xs hover:text-cyan-300 font-bold"
                             >
@@ -46,7 +46,8 @@ export default function Gallery({ results }) {
                         </div>
                     </div>
                 </motion.div>
-            ))}
-        </div>
+            ))
+            }
+        </div >
     );
 }
