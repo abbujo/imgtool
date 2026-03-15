@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import Dropzone from './components/Dropzone';
 import Gallery from './components/Gallery';
+import BulkCropper from './components/BulkCropper';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
@@ -11,10 +11,38 @@ function App() {
   const [zipUrl, setZipUrl] = useState(null);
   const [error, setError] = useState(null);
 
+  const [bulkFiles, setBulkFiles] = useState([]);
+  const [isCropping, setIsCropping] = useState(false);
+
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-
   const handleDrop = async (files, type = 'images') => {
+    if (type === 'bulk') {
+      setBulkFiles(files);
+      setIsCropping(true);
+      return;
+    }
+    
+    await processFiles(files, type);
+  };
+
+  const handleCropComplete = async (cropConfigs) => {
+    setIsCropping(false);
+    
+    // Transform cropConfigs for the server
+    const configs = {};
+    Object.keys(cropConfigs).forEach(fileName => {
+      const { pixelCrop } = cropConfigs[fileName];
+      configs[fileName] = {
+        crop: pixelCrop,
+        originalName: true // User wants exact same file name
+      };
+    });
+
+    await processFiles(bulkFiles, 'images', configs);
+  };
+
+  const processFiles = async (files, type, configs = null) => {
     setIsProcessing(true);
     setError(null);
     setResults([]);
@@ -24,6 +52,10 @@ function App() {
     files.forEach(file => {
       formData.append(type, file);
     });
+
+    if (configs) {
+      formData.append('configs', JSON.stringify(configs));
+    }
 
     try {
       const response = await axios.post(`${API_BASE_URL}/api/upload`, formData, {
@@ -59,12 +91,30 @@ function App() {
       </header>
 
       <main className="w-full max-w-5xl z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+        <div className="mb-8">
+          <Dropzone 
+            onDrop={handleDrop} 
+            isProcessing={isProcessing} 
+            type="bulk" 
+            title="Bulk Crop & Optimize" 
+            icon="✂️" 
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Dropzone onDrop={handleDrop} isProcessing={isProcessing} type="hero" title="Hero" icon="🖼️" />
           <Dropzone onDrop={handleDrop} isProcessing={isProcessing} type="card" title="Card" icon="🎴" />
           <Dropzone onDrop={handleDrop} isProcessing={isProcessing} type="logo" title="Logo" icon="🎯" />
           <Dropzone onDrop={handleDrop} isProcessing={isProcessing} type="icon" title="Icon (.ico)" icon="✨" />
         </div>
+
+        {isCropping && (
+          <BulkCropper 
+            files={bulkFiles} 
+            onComplete={handleCropComplete} 
+            onCancel={() => setIsCropping(false)} 
+          />
+        )}
 
         {error && (
           <motion.div

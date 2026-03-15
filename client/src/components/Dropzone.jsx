@@ -17,6 +17,7 @@ export default function Dropzone({ onDrop, isProcessing, title = "Drag & drop im
             'image/png': [],
             'image/jpeg': [],
             'image/jpg': [],
+            'image/avif': [],
         },
         disabled: isProcessing
     });

@@ -50,15 +50,20 @@ const processImage = async (filePath, outputDir, options = {}) => {
 
         try {
             if (policyName === 'ICON') {
-                // For ICON, we collect the PNG buffers and generate exactly one standard .ico file at the end
-                // We'll process them in a batch outside this loop, but let's gather them here
-                // Wait, it is better to just handle ICON as a completely separate block.
+                // ... ICON handling ...
             } else {
-                const outputFilename = `${name}-${width}.avif`;
+                const outputFilename = options.originalName ? `${name}.avif` : `${name}-${width}.avif`;
                 const outputPath = path.join(typeDir, outputFilename);
-                const pipeline = sharp(imageBuffer)
-                    .rotate() // autoRotate
-                    .resize({ width, withoutEnlargement: true });
+                let pipeline = sharp(imageBuffer)
+                    .rotate(); // autoRotate
+
+                // Apply crop if provided
+                if (options.crop) {
+                    const { x, y, width: w, height: h } = options.crop;
+                    pipeline = pipeline.extract({ left: Math.round(x), top: Math.round(y), width: Math.round(w), height: Math.round(h) });
+                }
+
+                pipeline = pipeline.resize({ width, withoutEnlargement: true });
 
                 // Merge policy options with CLI overrides
                 const avifOptions = {

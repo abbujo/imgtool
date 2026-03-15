@@ -112,23 +112,39 @@ app.post(
             const results = [];
 
             // Process options from body or defaults
-            const options = {
+            const globalOptions = {
                 quality: req.body.quality,
                 effort: req.body.effort,
                 cap: req.body.cap,
                 dryRun: false
             };
 
-            console.log(`[INFO] Processing with options:`, options);
+            // Enhanced: Parse per-file configurations if provided
+            let perFileConfigs = {};
+            if (req.body.configs) {
+                try {
+                    perFileConfigs = JSON.parse(req.body.configs);
+                } catch (e) {
+                    console.warn(`[WARN] Failed to parse configs:`, e.message);
+                }
+            }
+
+            console.log(`[INFO] Processing with global options:`, globalOptions);
 
             for (const item of fileList) {
                 const { file, policy } = item;
+                const fileConfig = perFileConfigs[file.originalname] || {};
 
                 console.log(
                     `[INFO] Processing file: ${file.originalname} (${file.size} bytes) with policy ${policy}`
                 );
 
-                const fileOptions = { ...options, policy };
+                const fileOptions = {
+                    ...globalOptions,
+                    ...fileConfig,
+                    policy: fileConfig.policy || policy
+                };
+
                 const fileResults = await processImage(file.path, sessionOutputDir, fileOptions);
                 results.push(...fileResults);
 
